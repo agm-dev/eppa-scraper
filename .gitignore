@@ -34,4 +34,4 @@ jspm_packages/
 # dotenv environment variables file
 .env
 
-app/data/
+app/data/*.json
