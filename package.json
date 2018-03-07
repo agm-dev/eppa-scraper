@@ -1,0 +1,23 @@
+{
+  "name": "eppa-scraper",
+  "version": "0.0.1",
+  "description": "Scraper app to get info about products from different online stores",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Adrian Gonzalo",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^5.0.1",
+    "puppeteer": "^1.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.1"
+  }
+}
