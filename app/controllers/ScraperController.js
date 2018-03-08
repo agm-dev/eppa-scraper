@@ -1,9 +1,11 @@
 const path = require('path');
 const InstantGaming = require('../models/InstantGaming');
+const G2A = require('../models/G2A');
 
 
 const stores = [
   InstantGaming,
+  G2A,
 ];
 
 exports.scrap = async () => {
