@@ -91,41 +91,100 @@ class G2A extends Scraper {
   }
 
   async getProducts () {
+    const links = this.links;
+    const page = await this.browser.newPage();
+    let products = [];
 
+    for (let i=0; i<links.length; i++) {
+      await page.goto(links[i], GOTO_OPTIONS);
+      const pageScriptData = await page.evaluate(() => {
+        // This block is executed in scope of webpage:
+        var platform = 'steam';
+        var region = 'global';
+
+        var data = {
+            error: false,
+            products: [],
+        };
+
+        var productsHtml = document.querySelectorAll('.products .Card__base');
+        if (!productsHtml) {
+            data.error = true;
+            return data;
+        }
+
+        var productsData = [];
+        productsHtml.forEach(item => {
+            var productData = {
+                link: '',
+                image: '',
+                name: '',
+                price: '',
+                currency: 'EUR',
+                preorder: false,
+            };
+
+            var link = item.querySelector('.Card__media a');
+            if (link && typeof link.href === 'string') {
+                productData.link = link.href.trim();
+            }
+            var image = item.querySelector('.Card__cover .Card__img--placeholder');
+            if (image && typeof image.src === 'string') {
+                productData.image = image.src.trim();
+            }
+
+            var name = item.querySelector('.Card__body .Card__title a');
+            if (name && typeof name.innerText === 'string') {
+                productData.name = name.innerText.trim();
+            }
+
+            var price = item.querySelector('.Card__body .Card__price-cost');
+            if (price && typeof price.innerText === 'string' && price.innerText.split(' ').length) {
+                var priceData = price.innerText.split(' ');
+                productData.price = parseFloat(priceData[0]);
+                if (priceData.length > 1 && priceData[1].trim() !== productData.currency) {
+                    productData.currency = priceData[1].trim();
+                }
+
+            }
+
+            var preorder = (item.querySelector('.Card__ribbon')) ? true : false;
+            if (preorder) {
+                productData.preorder = true;
+            }
+
+            // Filter product by platform and region using its name data:
+            /**
+             * This is added to discard some results, as we handle
+             * more than 10k results. This will avoid the total number
+             * of results matches the search founded :/ should I
+             * remove this and do it later?
+             */
+            var matchRegion = (region === 'global') ? 'GLOBAL' : region.toUpperCase();
+            var productMatchesPlatform = productData.name.toLowerCase().indexOf(platform) !== -1;
+            var productMatchesRegion = productData.name.indexOf(matchRegion) !== -1;
+            if (productMatchesRegion && productMatchesPlatform) {
+                productsData.push(productData);
+            }
+        });
+
+        data.products = productsData;
+        return data;
+      });
+
+      // Check data:
+      if (pageScriptData.error) {
+        // TODO: log error, maybe the html structure from G2A has changed.
+      }
+      console.log(`Scraping link ${i+1} / ${links.length}, found ${pageScriptData.products.length} products`);
+      products = [...products, ...pageScriptData.products];
+    }
+
+    // End of scraping:
+    this.products = products;
+    await page.close();
   }
 
 }
 
 module.exports = G2A;
-
-/**
- * NOTES:
- * It seems g2a search returns much more results that
- * instant gaming, but bad quality ones
- * - get all products from original links (around 14.000 products)
- * - filter that products by GLOBAL in name
- * - loop over those products, goto their link, then
- * extract some info only included in their product page:
- * platform, region, release date
- *
- * dom data:
- * const productsHtml = document.querySelectorAll('.products .Card__base');
- * forEach(item => ...)
- * const link = item.querySelector('.Card__media a').href;
- * const image = item.querySelector('.Card__cover .Card__img--placeholder').src
- * const name = item.querySelector('.Card__body .Card__title a').innerText;
- * const price = item.querySelector('.Card__body .Card__price-cost').innerText.split(' ')[0];
- * const currency = item.querySelector('.Card__body .Card__price-cost');
- * const preorder = (item.querySelector('.Card__ribbon')) ? true : false;
- *
- * const discount = null;
- *
- * once inside product page (link):
- *
- * const dataHtmlItems = document.querySelectorAll('.product__details-container__description .product-tags li')
- *
- * loop over them:
- * const region = (item.querySelector('.label').innerText === 'Plataforma') ? item.querySelector('strong').innerText;
- * const platform = (item.querySelector('.label').innerText === 'Región') ? item.querySelector('strong').innerText;
- * (only if preorder) const releaseDate = document.querySelector('.product__details__release-date strong').innerText
- */
