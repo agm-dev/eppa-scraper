@@ -106,7 +106,7 @@ class InstantGaming extends Scraper {
         console.error(`There was an error on scraping products on link ${links[i]}`);
       }
       const pageProducts = pageScriptData.products;
-      console.log(`Scraping link ${i+1} / ${links.length}`);
+      console.log(`Scraping link ${i+1} / ${links.length}, found ${pageProducts.length} products`);
       products = [...products, ...pageProducts];
     }
 
