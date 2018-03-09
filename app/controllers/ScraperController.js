@@ -30,7 +30,8 @@ exports.scrap = async () => {
     store.writeToFile(linksFile, store.links, 'links');
     store.writeToFile(productsFile, store.products, 'products');
 
-    // TODO: send request to API to store the data.
+    // Send request to API to store the data:
+    await store.sendProducts();
   }
 
 }
