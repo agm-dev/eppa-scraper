@@ -28,15 +28,19 @@ class Scraper {
   async sendProducts () {
     const products = this.products;
     const url = process.env.API_PRODUCTS_URL || null;
+    const client_id = process.env.CLIENT_ID || null;
     if (!url) {
       console.error(`You have to define API_PRODUCTS_URL in .env config file, where API_PRODUCTS_URL is the complete url of the API where products have to be sent`);
       process.exit();
+    }
+    if (!client_id) {
+      console.error(`You have to define CLIENT_ID in .env config file to be identified by the api`);
     }
     if (!this.products.length) {
       return console.error(`There are no products to be sent`);
     }
 
-    axios.post(url, { products })
+    axios.post(url, { products, client_id })
     .then(response => {
       // TODO:  check response:
       console.log(`Sent products to ${url}`);
