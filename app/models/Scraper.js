@@ -68,6 +68,18 @@ class Scraper {
       requests.push(request);
     }
 
+    // send the requests:
+    try {
+      const results = await axios.all(requests);
+      console.log(`finished sending requests`);
+      console.log(`got ${results.length} responses`);
+      const errors = results.filter(r => r.status !== 201);
+      const oks = results.filter(r => r.status === 201);
+      console.log(`${errors.length} errors, ${oks.length} success`);
+      //results.map(r => console.log(`${JSON.stringify(r.data)}`));
+    } catch (err) {
+      console.log(`error: ${err.message}`);
+    }
 
   }
 
