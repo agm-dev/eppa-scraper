@@ -9,7 +9,8 @@ class Scraper {
     this.links = [];
     this.products = [];
     this.browser = null;
-    this.REQUEST_ID_LENGTH = process.env.REQUEST_ID_LENGTH || 100;
+    this.REQUEST_ID_LENGTH = (typeof process.env.REQUEST_ID_LENGTH !== 'undefined') ? parseInt(process.env.REQUEST_ID_LENGTH) : 100;
+    this.MAX_NUM_PRODUCTS_PER_REQUEST = (typeof process.env.MAX_NUM_PRODUCTS_PER_REQUEST !== 'undefined') ? parseInt(process.env.MAX_NUM_PRODUCTS_PER_REQUEST) : 100;
   }
 
   openBrowser () {}
@@ -43,7 +44,6 @@ class Scraper {
     const products = this.products;
     const url = process.env.API_PRODUCTS_URL || null;
     const client_id = process.env.CLIENT_ID || null;
-    const request_id = this._genRequestId(this.REQUEST_ID_LENGTH);
     if (!url) {
       console.error(`You have to define API_PRODUCTS_URL in .env config file, where API_PRODUCTS_URL is the complete url of the API where products have to be sent`);
       process.exit();
@@ -55,14 +55,20 @@ class Scraper {
       return console.error(`There are no products to be sent`);
     }
 
-    axios.post(url, { products, client_id, request_id })
-    .then(response => {
-      // TODO:  check response:
-      console.log(`Sent products to ${url}`);
-    })
-    .catch(error => {
-      console.error(`ERROR on sending products: ${error.message}`);
-    });
+    // split products in N requests
+    const maxProducts = this.MAX_NUM_PRODUCTS_PER_REQUEST;
+    let requests = [];
+    for (let i=0; i<products.length; i=i+maxProducts) {
+      console.log(`iteration. i: ${i}, end: ${i+maxProducts}, maxProducts: ${maxProducts}`);
+      const request = axios.post(url, {
+        products: products.slice(i, i + maxProducts),
+        client_id,
+        request_id: this._genRequestId(this.REQUEST_ID_LENGTH),
+      });
+      requests.push(request);
+    }
+
+
   }
 
 }
