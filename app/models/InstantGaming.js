@@ -61,6 +61,13 @@ class InstantGaming extends Scraper {
         function getProductsInfo (htmlProducts) {
           const products = [];
           htmlProducts.forEach(item => {
+            var currency = null;
+            var selectedCurrency = document.querySelector('.ig-currency-selected');
+            if (selectedCurrency) {
+              var currencyItems = selectedCurrency.innerText.split(' ');
+              if (currencyItems.length) currency = currencyItems[0].trim();
+            }
+
             var price = typeof item.dataset !== 'undefined' && typeof item.dataset.price !== 'undefined' ? item.dataset.price : null;
             var region = typeof item.dataset !== 'undefined' && typeof item.dataset.region !== 'undefined' ? item.dataset.region : null;
             var link = null;
@@ -84,7 +91,7 @@ class InstantGaming extends Scraper {
               name = nameHtml.innerText;
             }
 
-            products.push({ name, price, discount, region, link, image });
+            products.push({ name, price, discount, region, link, image, currency });
           });
           return products;
         }
