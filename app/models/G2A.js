@@ -176,8 +176,10 @@ class G2A extends Scraper {
       if (pageScriptData.error) {
         // TODO: log error, maybe the html structure from G2A has changed.
       }
-      console.log(`Scraping link ${i+1} / ${links.length}, found ${pageScriptData.products.length} products`);
-      products = [...products, ...pageScriptData.products];
+      const pageProducts = pageScriptData.products;
+      console.log(`Scraping link ${i+1} / ${links.length}, found ${pageProducts.length} products`);
+      this._sendProducts(pageProducts);
+      products = [...products, ...pageProducts];
     }
 
     // End of scraping:

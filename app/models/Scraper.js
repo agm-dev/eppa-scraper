@@ -40,8 +40,8 @@ class Scraper {
     return result;
   }
 
-  async sendProducts () {
-    const products = this.products;
+  _sendProducts (products) {
+    products = products || [];
     const url = process.env.API_PRODUCTS_URL || null;
     const client_id = process.env.CLIENT_ID || null;
     if (!url) {
@@ -51,7 +51,7 @@ class Scraper {
     if (!client_id) {
       console.error(`You have to define CLIENT_ID in .env config file to be identified by the api`);
     }
-    if (!this.products.length) {
+    if (!products.length) {
       return console.error(`There are no products to be sent`);
     }
 
@@ -69,17 +69,17 @@ class Scraper {
     }
 
     // send the requests:
-    try {
-      const results = await axios.all(requests);
+    axios.all(requests)
+    .then(results => {
       console.log(`finished sending requests`);
       console.log(`got ${results.length} responses`);
       const errors = results.filter(r => r.status !== 201);
       const oks = results.filter(r => r.status === 201);
       console.log(`${errors.length} errors, ${oks.length} success`);
-      //results.map(r => console.log(`${JSON.stringify(r.data)}`));
-    } catch (err) {
-      console.log(`error: ${err.message}`);
-    }
+      results.map(r => console.log(`${JSON.stringify(r.data)}`));
+    }).catch(error => {
+      console.log(`error on axios.all: ${err.message}`);
+    });
 
   }
 
