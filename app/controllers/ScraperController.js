@@ -29,9 +29,6 @@ exports.scrap = async () => {
     const productsFile = path.join(__dirname, '..', 'data', `${instanceName}_products.json`)
     store.writeToFile(linksFile, store.links, 'links');
     store.writeToFile(productsFile, store.products, 'products');
-
-    // Send request to API to store the data:
-    await store.sendProducts();
   }
 
 }
