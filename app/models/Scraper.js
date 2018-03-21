@@ -59,12 +59,13 @@ class Scraper {
     const maxProducts = this.MAX_NUM_PRODUCTS_PER_REQUEST;
     let requests = [];
     for (let i=0; i<products.length; i=i+maxProducts) {
-      console.log(`iteration. i: ${i}, end: ${i+maxProducts}, maxProducts: ${maxProducts}`);
+      const sliceOfProducts = products.slice(i, i + maxProducts);
       const request = axios.post(url, {
-        products: products.slice(i, i + maxProducts),
+        products: sliceOfProducts,
         client_id,
         request_id: this._genRequestId(this.REQUEST_ID_LENGTH),
       });
+      console.log(`iteration. i: ${i}, end: ${i+maxProducts}, maxProducts: ${maxProducts}, total products: ${sliceOfProducts.length}`);
       requests.push(request);
     }
 
