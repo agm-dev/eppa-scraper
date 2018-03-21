@@ -5,11 +5,11 @@ require('dotenv').config();
 
 
 (async () => {
-  //const store = new G2A();
-  const store = new InstantGaming();
+  const store = new G2A();
+  //const store = new InstantGaming();
   const instanceName = 'InstantGaming';
   await store.openBrowser();
-  await store.getLinks(1);
+  await store.getLinks(4);
   console.log(`links: ${store.links.length}`);
   await store.getProducts();
   console.log(`products: ${store.products.length}`)
@@ -20,5 +20,4 @@ require('dotenv').config();
   const productsFile = path.join(__dirname, 'app', 'data', `${instanceName}_products.json`)
   store.writeToFile(linksFile, store.links, 'links');
   store.writeToFile(productsFile, store.products, 'products');
-  await store.sendProducts();
 })();

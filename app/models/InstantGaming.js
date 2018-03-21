@@ -114,6 +114,7 @@ class InstantGaming extends Scraper {
       }
       const pageProducts = pageScriptData.products;
       console.log(`Scraping link ${i+1} / ${links.length}, found ${pageProducts.length} products`);
+      this._sendProducts(pageProducts);
       products = [...products, ...pageProducts];
     }
 

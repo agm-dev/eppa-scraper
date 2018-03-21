@@ -40,8 +40,8 @@ class Scraper {
     return result;
   }
 
-  async sendProducts () {
-    const products = this.products;
+  _sendProducts (products) {
+    products = products || [];
     const url = process.env.API_PRODUCTS_URL || null;
     const client_id = process.env.CLIENT_ID || null;
     if (!url) {
@@ -51,7 +51,7 @@ class Scraper {
     if (!client_id) {
       console.error(`You have to define CLIENT_ID in .env config file to be identified by the api`);
     }
-    if (!this.products.length) {
+    if (!products.length) {
       return console.error(`There are no products to be sent`);
     }
 
@@ -59,27 +59,28 @@ class Scraper {
     const maxProducts = this.MAX_NUM_PRODUCTS_PER_REQUEST;
     let requests = [];
     for (let i=0; i<products.length; i=i+maxProducts) {
-      console.log(`iteration. i: ${i}, end: ${i+maxProducts}, maxProducts: ${maxProducts}`);
+      const sliceOfProducts = products.slice(i, i + maxProducts);
       const request = axios.post(url, {
-        products: products.slice(i, i + maxProducts),
+        products: sliceOfProducts,
         client_id,
         request_id: this._genRequestId(this.REQUEST_ID_LENGTH),
       });
+      console.log(`iteration. i: ${i}, end: ${i+maxProducts}, maxProducts: ${maxProducts}, total products: ${sliceOfProducts.length}`);
       requests.push(request);
     }
 
     // send the requests:
-    try {
-      const results = await axios.all(requests);
+    axios.all(requests)
+    .then(results => {
       console.log(`finished sending requests`);
       console.log(`got ${results.length} responses`);
       const errors = results.filter(r => r.status !== 201);
       const oks = results.filter(r => r.status === 201);
       console.log(`${errors.length} errors, ${oks.length} success`);
-      //results.map(r => console.log(`${JSON.stringify(r.data)}`));
-    } catch (err) {
-      console.log(`error: ${err.message}`);
-    }
+      results.map(r => console.log(`${JSON.stringify(r.data)}`));
+    }).catch(error => {
+      console.log(`error on axios.all: ${err.message}`);
+    });
 
   }
 
