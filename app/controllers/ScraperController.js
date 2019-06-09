@@ -5,7 +5,7 @@ const G2A = require('../models/G2A');
 
 const stores = [
   InstantGaming,
-  G2A,
+  //G2A, // i can't scrap g2a in headless mode :( only headless: false works :(
 ];
 
 exports.scrap = async () => {

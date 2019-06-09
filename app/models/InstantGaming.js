@@ -1,5 +1,8 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const pluginStealth = require('puppeteer-extra-plugin-stealth')
 const Scraper = require('./Scraper');
+
+puppeteer.use(pluginStealth());
 
 const GOTO_OPTIONS = { timeout: 0, waitUntil: 'domcontentloaded' };
 
@@ -11,7 +14,7 @@ class InstantGaming extends Scraper {
   }
 
   async openBrowser () {
-    this.browser = await puppeteer.launch();
+    this.browser = await puppeteer.launch({ headless: true });
   }
 
   async closeBrowser () {

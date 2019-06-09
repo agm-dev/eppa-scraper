@@ -1,8 +1,12 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+const pluginStealth = require('puppeteer-extra-plugin-stealth')
 const Scraper = require('./Scraper');
 
+puppeteer.use(pluginStealth());
+
 // FIX: as this is the same option used in other classes, place it into external puppeteer constants file or config file
-const GOTO_OPTIONS = { timeout: 0, waitUntil: 'domcontentloaded' }
+//const GOTO_OPTIONS = { timeout: 0, waitUntil: 'domcontentloaded' }
+const GOTO_OPTIONS = { timeout: 0, waitUntil: 'networkidle0' }
 
 class G2A extends Scraper {
 
@@ -14,7 +18,7 @@ class G2A extends Scraper {
 
   // FIX: check if this can be done in parent class
   async openBrowser () {
-    this.browser = await puppeteer.launch();
+    this.browser = await puppeteer.launch({ headless: false });
   }
 
   // FIX: check if this can be done in parent class
@@ -42,6 +46,7 @@ class G2A extends Scraper {
 
       // Get expected results:
       const queryResultsHtml = document.querySelector('.listing-header__query-results span span');
+
       if (!queryResultsHtml || typeof queryResultsHtml.innerText !== 'string' || !queryResultsHtml.innerText.length || queryResultsHtml.innerText.split(' ').length < 1 || isNaN(Number(queryResultsHtml.innerText.split(' ')[0]))) {
         // TODO: send and log error, this class is broken and maybe G2A has changed HTML structure.
         data.queryResults = { error: true, value: 0 };
@@ -51,7 +56,7 @@ class G2A extends Scraper {
       }
 
       // Get number of pages:
-      const nPagesHtml = document.querySelector('.pagination-page');
+      const nPagesHtml = document.querySelector('.pagination__translation');
       if (!nPagesHtml || typeof nPagesHtml.innerText !== 'string' || !nPagesHtml.innerText.length) {
         // TODO: send and log error, this class is broken and maybe G2A has changed HTML structure.
         data.links = { error: true, value: 0 };
@@ -92,6 +97,7 @@ class G2A extends Scraper {
 
   async getProducts () {
     const links = this.links;
+    console.log(links.length);
     const page = await this.browser.newPage();
     let products = [];
 
@@ -128,7 +134,7 @@ class G2A extends Scraper {
             if (link && typeof link.href === 'string') {
                 productData.link = link.href.trim();
             }
-            var image = item.querySelector('.Card__cover .Card__img--placeholder');
+            var image = item.querySelector('.Card__cover .lazy-image__img');
             if (image && typeof image.src === 'string') {
                 productData.image = image.src.trim();
             }
