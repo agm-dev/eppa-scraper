@@ -14,11 +14,11 @@
   "author": "Adrian Gonzalo",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.19.0",
     "dotenv": "^5.0.1",
-    "puppeteer": "^1.1.1"
+    "puppeteer": "^1.17.0"
   },
   "devDependencies": {
-    "nodemon": "^1.17.1"
+    "nodemon": "^1.19.1"
   }
 }
