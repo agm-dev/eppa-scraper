@@ -18,7 +18,7 @@ class G2A extends Scraper {
 
   // FIX: check if this can be done in parent class
   async openBrowser () {
-    this.browser = await puppeteer.launch({ headless: false });
+    this.browser = await puppeteer.launch({ headless: true });
   }
 
   // FIX: check if this can be done in parent class
